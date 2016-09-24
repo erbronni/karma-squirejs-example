@@ -1,0 +1,27 @@
+{
+  "name": "karma-squirejs-example",
+  "version": "0.0.1",
+  "description": "Example of mocking AMD modules with Karma and Squire.js",
+  "main": "run.js",
+  "scripts": {
+    "test": "karma"
+  },
+  "keywords": [
+    "karma",
+    "requirejs",
+    "squirejs"
+  ],
+  "author": "Eric Bronnimann",
+  "license": "MIT",
+  "private": true,
+  "devDependencies": {
+    "jasmine-core": "^2.5.2",
+    "karma": "^1.3.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-jasmine": "^1.0.2",
+    "karma-jasmine-jquery": "^0.1.1",
+    "karma-phantomjs-launcher": "^1.0.2",
+    "karma-requirejs": "^1.1.0",
+    "requirejs": "^2.3.2"
+  }
+}
