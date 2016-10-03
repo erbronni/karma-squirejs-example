@@ -1,0 +1,33 @@
+{
+  "name": "karma-squirejs-example",
+  "description": "Example of mocking AMD modules with Karma and Squire.js",
+  "main": "",
+  "authors": [
+    "Eric Bronnimann"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "karma",
+    "requirejs",
+    "squirejs"
+  ],
+  "moduleType": [],
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "karma.conf.js",
+    "test-main.js",
+    "spec",
+    "package.json"
+  ],
+  "dependencies": {
+    "postal.js": "postal#~2.0.4",
+    "es6-shim": "~0.35.1"
+  },
+  "devDependencies": {
+    "Squire.js": "squire#~0.2.0"
+  }
+}

@@ -1,0 +1,36 @@
+ {
+    "disallowMixedSpacesAndTabs": true,
+    "validateIndentation": 2,
+    "disallowSpacesInFunctionDeclaration": {
+        "beforeOpeningRoundBrace": true
+    },
+    "requireSpacesInFunctionDeclaration": {
+        "beforeOpeningCurlyBrace": true
+    },
+    "requireSpacesInAnonymousFunctionExpression": {
+        "beforeOpeningRoundBrace": true,
+        "beforeOpeningCurlyBrace": true
+    },
+    "disallowSpacesInCallExpression": true,
+    "requireSpaceAfterKeywords": ["if","else","for","while","do","switch","try","catch","finally"],
+    "requireSpaceAfterBinaryOperators": true,
+    "requireSpaceBeforeBinaryOperators": true,
+    "requireSpaceBeforeBlockStatements": true,
+    "requireSpaceBeforeKeywords": ["else","while","catch","finally"],
+    "disallowSpacesInsideParentheses": true,
+    "requireSpacesInConditionalExpression": true,
+    "requireSpaceBetweenArguments": true,
+    "disallowSpaceAfterObjectKeys": true,
+    "requireSpaceBeforeObjectValues": true,
+    "disallowMultipleLineBreaks": true,
+    "disallowMultipleSpaces": true,
+    "requireCurlyBraces": ["if","else","for","while","do"],
+    "disallowNewlineBeforeBlockStatements": true,
+    "requireSpacesInForStatement": true,
+    "disallowMultipleLineStrings": true,
+    "requireSemicolons": true,
+    "validateQuoteMarks": "'", /* quotmark */
+    "maximumLineLength": 120, /* maxlen */
+    "disallowEmptyBlocks": true, /* noempty */
+    "requireParenthesesAroundIIFE": true /* immed */
+}
