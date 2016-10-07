@@ -1,22 +1,17 @@
 Mocking Module Dependencies with Squire.js and Karma
 ==========================
-[Karma](http://karma-runner.github.io/) is a great test runner that has support for [RequireJS](http://requirejs.org). 
-When running with the [karam-requirejs](https://github.com/karma-runner/karma-requirejs) plugin, karma will use require
-to load the modules and the tests, leveraging the existing module architecture.  While this is all great, there are 
-some drawbacks, as how do you mock out a module dependency from the tests.  Luckily, there is a library, 
-[Squire.js](https://github.com/iammerrick/Squire.js/), that solves that exact problem, mocking out module dependencies. 
-This project provides a full, but simple, example of using [Karma](http://karma-runner.github.io/), 
-[Jasmine](https://jasmine.github.io), [RequireJS](http://www.requirejs.org), and 
-[Squire.js](https://github.com/iammerrick/Squire.js/) together to write unit tests.
+This is a simple project that demonstrates how to use [Squire.js](https://github.com/iammerrick/Squire.js/) with 
+[Karma](http://karma-runner.github.io/) to mock AMD module dependencies.
 
 TL;DR
 -----
 To install Squire use ```bower install squire --save-dev``` or ```npm install squirejs --save-dev```.  Then you can use
 Squire to mock module dependencies by creating an ```injector```, calling ```mock``` with the modules to mock, and then 
-```require``` to load the module under test.  Note since ```require``` takes a callback, the test is asynchronous, so 
-the ```done``` function must be invoked, otherwise Jasmine won't be able to process the test results correctly.
+```require``` to load the module under test.  Make sure to invoke the ```done``` function since the call to ```require```
+is asynchronous.
 ```
 define(['Squire'], function (Squire) {
+  describe('Chat widget specification', function () {
     it('Should subscribe to the public channel', function (done) {
       var injector = new Squire(),
         postal = jasmine.createSpyObj('postal', ['subscribe']);
@@ -32,18 +27,12 @@ define(['Squire'], function (Squire) {
         done();
       });
     });
+  });
 });
 ```
-If you just start using [Squire.js](https://github.com/iammerrick/Squire.js/) in your test, you might have noticed some 
-strange behavior, as the number of tests run by Karma seems to grow exponentially.  This is because Squire is creating a
-new context every time it invokes ```require```.  The separate context allows Squire to create a sandbox to 
-isolate the module dependencies and injects the mock modules.  Unfortunately, every time a context is created, the 
-callback on the require configuration is invoked, calling ```__karma__.start```. 
-
-If you want to jump right to the solution, the test-main.js below will ensure that karma is started only once.  The 
- require.js ```callback``` is set to the ```startKarma``` function .  The ```runOnce``` flag is used by the 
- ```startKarma``` function to ensure ```__karma__.start``` is only executed only once.  This prevents karma from 
- starting up again every time Squire is invoked.
+The ```test-main.js``` file also needs to be modified.  When Squire.js invokes ```require``` to create a new context, the
+```require.config``` is loaded, which causes the ```callback``` to be invoked multiple times.  So the ```callback```
+needs to be modified so that it only starts up Karma once.
 ```
 var allTestFiles = [];
 var TEST_REGEXP = /^\/base\/spec\/.*Spec\.js$/;
@@ -76,104 +65,89 @@ require.config({
   callback: startKarma
 });
 ```
+Overview
+--------
+The project consists of a simple JavaScript file, [chat.js](src/chat.js), that is tested by the [chatSpec.js](spec/chatSpec.js) file.  The code
+uses [postal.js](https://github.com/postaljs/postal.js) to subscribe to a public and private channel.  That all the implementation does to 
+ keep the focus on setting up [Squire.js](https://github.com/iammerrick/Squire.js/) to run with [Karma](http://karma-runner.github.io).  
 
-Getting started with the project
-=============
-This project contains 
-
+Running the tests
+----------------
+To run the unit tests in this project, run the following commands. Karma is configured to run with Chrome.  If you need to change to a different
+browser, make sure to install the launch via ```npm``` and update the ```karma.conf.js``` file.
 ```
 npm install
 bower install
 npm run-script karma
 ```
 
-Why would I need to mock a module dependency?
----------------------------------------------
-When the code under test calls a module during its initialization, the test code won't have a chance to spy on the 
-invocation if it waits until after the module has loaded.  By creating a mock module and having the code under test 
-initialize with the mock module, the test code gets a chance to intercept and record the invocation.
-
-In this ```chat.js``` modules, the script subscribes to two messaging channels when it is loaded.  To confirm that 
- these calls are made, the test framework will need to monitor the calls to the ```postal``` module 
-
-```
-define('chat', ['postal'], function (postal) {
-
-  'use strict';
-
-  /**
-   * Centralized event handler for application.
-   * @exports chat
-   */
-  var chat = {
-    /**
-     * Postal channel.
-     */
-    CHANNEL: 'public',
-
-    /**
-     * Handler for public messages.
-     */
-    publicHandler: function () {
-      console.log('INVOKED PUBLIC HANDLER');
-    },
-
-    /**
-     * Handler for private messages.
-     * @private
-     */
-    _privateHandler: function () {
-      console.log('INVOKED PRIVATE HANDLER');
-    }
-
-  };
-
-  // Subscribe to the public channel.
-  postal.subscribe({
-    channel: chat.CHANNEL,
-    topic: '#',
-    callback: chat.publicHandler
-  });
-
-  // Subscribe tot he private channel
-  postal.subscribe({
-    channel: 'private',
-    topic: '#',
-    callback: chat._privateHandler
-  });
-
-  return chat;
-
-});
-```
-
 Writing tests with Squire.js
 ----------------------------
-The first thing to do is get a refernce to the Squire module in the ```define``` block of the test.
+The [chat.js](js/chat.js) script subscribes to a public and private channel through [postal.js](https://github.com/postaljs/postal.js). 
+The test specification will confirm that both these subscription calls are made by creating a mock postal module and then confirming
+the ```subscribe``` function is invoked with the correct parameters.  Here is a break down of [chaSpec.js](spec/chatSpec.js) file.
+
+The first thing to do is get a refernce to the Squire module in the ```define``` block of the test.  Then ```describe``` and ```it``` 
+are used to create the test suite and the individual tests.  
 ```
-define(['Squire'], function (Squire) { });
+define(['Squire'], function (Squire) { 
+  describe('Chat test spec', function () {
+    it('Should export chat module', function (done) { /* ... */ });
+    it('Should subscribe to the public channel', function (done) { /* ... */});
+    it('Should subscribe to the private channel', function (done) { /* ... */});
+  });
+});
+```
+Each of the test callbacks passed into the ```it``` function takes the ```done``` parameters.  Jasmine uses the argument length to 
+determine whether the test is asynchronous or not.  Since all the tests using Squire.js will be asynchrnous, the ```done``` paramter 
+must be defined on the function call.
+
+Below is once of the tests from [chatSpec.js](spec/chatSpec.js) that will be used to outline how to use [Squire.js](https://github.com/iammerrick/Squire.js/):
+```
+it('Should subscribe to the public channel', function (done) {
+  var injector = new Squire(),
+      postal = jasmine.createSpyObj('postal', ['subscribe']);
+  injector.mock({
+    postal: postal
+  }).require(['chat'], function (chat) {
+    expect(postal.subscribe).toHaveBeenCalledWith({
+      channel: 'public',
+      topic: '#',
+      callback: chat.publicHandler
+    });
+    done();
+  });
+});
 ```
 The ```Squire``` reference is a constructor.  Use it to create a new ```injector``` reference.  The ```injector``` 
 creates a new require context behind the scenes, sandboxing the module loading.
 ```
-var injector = new Squire();
+var injector = new Squire(),
 ```
-The add the mock modules to the injector using the ```mock``` function.  The mock function ahs two syntaxes, either
+The code also creates spy object that will be usedd to mock the behavior of the ````postal``` library.
+```
+  postal = jasmine.createSpyObj('postal', ['subscribe']);
+```
+The add the mock modules to the injector using the ```mock``` function.  The mock function has two syntaxes, either
 the name of the module and a reference to the mock object:
 ```
-injector.mock('postal', jasmine.createSpyObj('postal', ['subscribe']);
+injector.mock('postal', postal);
 ```
 Or pass in an object literal with the name/mock pairs:
 ```
 injector.mock({
-  postal: jasmine.createSpyObj('postal', ['subscribe']),
-  util: jasmine.createSpyObj('util', ['promiseWrapper'])
+  postal: postal
 });
 ```
-Then call ```require``` to load up your module and perform and verify the correct calls have been made:
+The functions calls can be chained because the ```mock``` call returns a reference to itself.  After setting the mocks, the test calls
+ ```require``` to load up the modules.  Then in the callback to the ```require``` call, verify the correct calls have been made:
 ```
 injector.require(['chat'], function (chat) { 
-    expect(postal.subscribe).toHaveBeenCalled();
+    expect(postal.subscribe).toHaveBeenCalledWith({
+      channel: 'public',
+      topic: '#',
+      callback: chat.publicHandler
+    });
     done();
 })
 ```

@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "Example of mocking AMD modules with Karma and Squire.js",
   "scripts": {
+    "test": "karma start",
     "karma": "karma start",
     "jshint": "gulp jshint",
     "jscs": "gulp jscs",
